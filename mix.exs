@@ -38,7 +38,7 @@ defmodule Taxes.MixProject do
   defp package do
     [
       name: "channex_taxes",
-      files: ~w(lib config .formatter.exs mix.exs README.md LICENSE),
+      files: ~w(lib .formatter.exs mix.exs README.md LICENSE),
       maintainers: ["Andrew Judis Yudin"],
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/ChannexIO/tax_calculator"}
