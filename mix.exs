@@ -10,8 +10,9 @@ defmodule Taxes.MixProject do
       deps: deps(),
       description: description(),
       name: "Channex Taxes",
-      source_url: "https://bitbucket.org/buuqitcom/taxes",
-      test_coverage: [tool: ExCoveralls]
+      source_url: "https://github.com/ChannexIO/tax_calculator",
+      test_coverage: [tool: ExCoveralls],
+      package: package()
     ]
   end
 
@@ -31,6 +32,16 @@ defmodule Taxes.MixProject do
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
+    ]
+  end
+
+  defp package do
+    [
+      name: "channex_taxes",
+      files: ~w(lib config .formatter.exs mix.exs README.md LICENSE),
+      maintainers: ["Andrew Judis Yudin"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/ChannexIO/tax_calculator"}
     ]
   end
 end
