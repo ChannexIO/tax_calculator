@@ -68,4 +68,36 @@ defmodule Taxes.Organizer do
   def get_mark_value(%{is_inclusive: true}, :is_inclusive), do: :inclusive
   def get_mark_value(%{is_inclusive: false}, :is_inclusive), do: :exclusive
   def get_mark_value(tax, field), do: Map.fetch!(tax, field)
+
+  @doc """
+  Method to convert taxes rate into float
+  """
+  @spec convert_taxes_rate(map) :: map
+  def convert_taxes_rate(%{taxes: taxes} = args) when is_map(args) do
+    Map.put(
+      args,
+      :taxes,
+      convert_tax_rate(taxes)
+    )
+  end
+
+  def convert_tax_rate(taxes) when is_list(taxes) do
+    Enum.map(taxes, &convert_tax_rate/1)
+  end
+
+  def convert_tax_rate(%{rate: rate} = tax) when is_integer(rate) do
+    tax
+    |> Map.put(:rate, rate / 100)
+    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, [])))
+  end
+
+  def convert_tax_rate(%{rate: rate} = tax) when is_binary(rate) do
+    tax
+    |> Map.put(:rate, String.to_float(rate))
+    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, [])))
+  end
+
+  def convert_tax_rate(tax) when is_nil(tax), do: nil
+
+  def convert_tax_rate(tax), do: tax
 end

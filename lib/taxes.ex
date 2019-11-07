@@ -23,6 +23,7 @@ defmodule Taxes do
       count_of_nights: count_of_nights,
       calculated_taxes: []
     }
+    |> Organizer.convert_taxes_rate()
     |> Organizer.group_taxes()
     |> Calculator.set_net_price()
     |> Calculator.calculate_taxes(:inclusive)
