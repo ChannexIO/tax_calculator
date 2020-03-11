@@ -85,6 +85,12 @@ defmodule Taxes.Organizer do
     Enum.map(taxes, &convert_tax_rate(&1, exponent))
   end
 
+  def convert_tax_rate(%{rate: rate, logic: :percent} = tax, exponent) when is_integer(rate) do
+    tax
+    |> Map.put(:rate, rate / :math.pow(10, 2))
+    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, []), exponent))
+  end
+
   def convert_tax_rate(%{rate: rate} = tax, exponent) when is_integer(rate) do
     tax
     |> Map.put(:rate, rate / :math.pow(10, exponent))
