@@ -9,7 +9,7 @@ defmodule Taxes.LogicTest do
       logic: :percent
     }
 
-    payload = %{price: 100.00}
+    payload = %{price: 100.00, exponent: 2}
 
     assert Logic.calculate_tax(tax, payload) == {"TAX", 20.00}
   end

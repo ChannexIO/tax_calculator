@@ -2,12 +2,11 @@ defmodule Taxes.Logic do
   @moduledoc """
   Module with logic operations to calculate each type of tax
   """
-  @precision 2
   alias Taxes.Types
 
   @spec calculate_tax(Types.tax(), Types.payload()) :: {String.t(), float()}
-  def calculate_tax(%{title: title, rate: rate, logic: :percent}, %{price: price}) do
-    {title, Float.round(price * (rate / 100), @precision)}
+  def calculate_tax(%{title: title, rate: rate, logic: :percent}, %{price: price, exponent: exponent}) do
+    {title, Float.round(price * (rate / 100), exponent)}
   end
 
   def calculate_tax(%{title: title, rate: rate, logic: :per_room}, %{count_of_rooms: count_of_rooms}) do

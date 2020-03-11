@@ -6,13 +6,12 @@ defmodule Taxes.Calculator do
   alias Taxes.Logic
 
   @hundred_percents 100
-  @precision 2
 
   @doc """
   Method to get Net price from `raw_price` by exclude inclusive taxes
   """
   @spec set_net_price(Types.payload()) :: Types.payload()
-  def set_net_price(%{inclusive: taxes, raw_price: price} = payload) do
+  def set_net_price(%{inclusive: taxes, raw_price: price, exponent: exponent} = payload) do
     %{percent: percent, fixed: fixed} = get_tax_amounts(taxes, %{percent: 0, fixed: 0}, payload)
     price_without_fixed = price - fixed
 
@@ -23,7 +22,7 @@ defmodule Taxes.Calculator do
     Map.put(
       payload,
       :net_price,
-      Float.round(price_without_fixed - percents_amount, @precision)
+      Float.round(price_without_fixed - percents_amount, exponent)
     )
   end
 

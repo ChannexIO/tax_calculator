@@ -14,14 +14,15 @@ defmodule Taxes do
   To do that, at first step, we should group taxes by type.
   """
   @spec calculate(float(), [Types.tax()]) :: {:ok, float(), float(), [tuple()]}
-  def calculate(price, taxes, count_of_persons \\ 1, count_of_rooms \\ 1, count_of_nights \\ 1) do
+  def calculate(price, taxes, exponent \\ 2, count_of_persons \\ 1, count_of_rooms \\ 1, count_of_nights \\ 1) do
     %{
       taxes: taxes,
       raw_price: price,
       count_of_persons: count_of_persons,
       count_of_rooms: count_of_rooms,
       count_of_nights: count_of_nights,
-      calculated_taxes: []
+      calculated_taxes: [],
+      exponent: exponent
     }
     |> Organizer.convert_taxes_rate()
     |> Organizer.group_taxes()

@@ -73,31 +73,31 @@ defmodule Taxes.Organizer do
   Method to convert taxes rate into float
   """
   @spec convert_taxes_rate(map) :: map
-  def convert_taxes_rate(%{taxes: taxes} = args) when is_map(args) do
+  def convert_taxes_rate(%{taxes: taxes, exponent: exponent} = args) when is_map(args) do
     Map.put(
       args,
       :taxes,
-      convert_tax_rate(taxes)
+      convert_tax_rate(taxes, exponent)
     )
   end
 
-  def convert_tax_rate(taxes) when is_list(taxes) do
-    Enum.map(taxes, &convert_tax_rate/1)
+  def convert_tax_rate(taxes, exponent) when is_list(taxes) do
+    Enum.map(taxes, &convert_tax_rate(&1, exponent))
   end
 
-  def convert_tax_rate(%{rate: rate} = tax) when is_integer(rate) do
+  def convert_tax_rate(%{rate: rate} = tax, exponent) when is_integer(rate) do
     tax
-    |> Map.put(:rate, rate / 100)
-    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, [])))
+    |> Map.put(:rate, rate / :math.pow(10, exponent))
+    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, []), exponent))
   end
 
-  def convert_tax_rate(%{rate: rate} = tax) when is_binary(rate) do
+  def convert_tax_rate(%{rate: rate} = tax, exponent) when is_binary(rate) do
     tax
     |> Map.put(:rate, String.to_float(rate))
-    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, [])))
+    |> Map.put(:taxes, convert_tax_rate(Map.get(tax, :taxes, []), exponent))
   end
 
-  def convert_tax_rate(tax) when is_nil(tax), do: nil
+  def convert_tax_rate(tax, _) when is_nil(tax), do: nil
 
-  def convert_tax_rate(tax), do: tax
+  def convert_tax_rate(tax, _), do: tax
 end
