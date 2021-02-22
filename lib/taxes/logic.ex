@@ -13,6 +13,10 @@ defmodule Taxes.Logic do
     {title, rate * count_of_rooms}
   end
 
+  def calculate_tax(%{title: title, rate: rate, logic: :per_night}, %{count_of_nights: count_of_nights}) do
+    {title, rate * count_of_nights}
+  end
+
   def calculate_tax(%{title: title, rate: rate, logic: :per_room_per_night}, %{count_of_rooms: count_of_rooms, count_of_nights: count_of_nights}) do
     {title, rate * count_of_rooms * count_of_nights}
   end
