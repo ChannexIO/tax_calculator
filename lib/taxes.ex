@@ -13,7 +13,7 @@ defmodule Taxes do
   Based at this basis, to get Net Price, we should exclude all inclusive taxes from Price.
   To do that, at first step, we should group taxes by type.
   """
-  @spec calculate(float(), [Types.tax()]) :: {:ok, float(), float(), [tuple()]}
+  @spec calculate(float() | integer(), [Types.tax()]) :: {:ok, float(), float(), [tuple()]}
   def calculate(price, taxes, exponent \\ 2, count_of_persons \\ 1, count_of_rooms \\ 1, count_of_nights \\ 1) do
     %{
       taxes: taxes,

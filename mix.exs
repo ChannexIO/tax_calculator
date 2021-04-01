@@ -4,7 +4,7 @@ defmodule Taxes.MixProject do
   def project do
     [
       app: :taxes,
-      version: "0.2.5",
+      version: "0.2.6",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
