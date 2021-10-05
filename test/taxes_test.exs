@@ -222,4 +222,56 @@ defmodule TaxesTest do
       {"Provincial tax", 28.64},
     ]}
   end
+
+  test "should calculate USA 2 level tax case" do
+    taxes = [
+      %{
+        title: "10% City Tax",
+        rate: 10.00,
+        is_inclusive: false,
+        logic: :percent,
+        taxes: [
+          %{
+            title: "$10 cleaning fee",
+            rate: 10.00,
+            is_inclusive: false,
+            logic: :per_booking
+          },
+          %{
+            title: "10% reservation fee",
+            rate: 10.00,
+            is_inclusive: false,
+            logic: :percent
+          }
+        ]
+      },
+      %{
+        title: "3% TBID Tax",
+        rate: 3.00,
+        is_inclusive: false,
+        logic: :percent,
+        taxes: [
+          %{
+            title: "$10 cleaning fee",
+            rate: 10.00,
+            is_inclusive: false,
+            logic: :per_booking
+          },
+          %{
+            title: "10% reservation fee",
+            rate: 10.00,
+            is_inclusive: false,
+            logic: :percent
+          }
+        ]
+      }
+    ]
+
+    assert Taxes.calculate(100.00, taxes) == {:ok, 100.00, 135.60, [
+      {"3% TBID Tax", 3.6},
+      {"10% reservation fee", 10.0},
+      {"$10 cleaning fee", 10.0},
+      {"10% City Tax", 12.0}
+    ]}
+  end
 end

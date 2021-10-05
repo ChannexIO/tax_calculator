@@ -116,4 +116,16 @@ defmodule Taxes.Calculator do
       net_price + Enum.reduce(taxes, 0, fn {_, amount}, acc -> acc + amount end)
     )
   end
+
+  @doc """
+  Remove duplicated taxes
+  """
+  @spec remove_duplicates(Types.payload()) :: Types.payload
+  def remove_duplicates(%{calculated_taxes: taxes} = payload) do
+    Map.put(
+      payload,
+      :calculated_taxes,
+      Enum.uniq(taxes)
+    )
+  end
 end

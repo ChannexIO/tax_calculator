@@ -29,6 +29,7 @@ defmodule Taxes do
     |> Calculator.set_net_price()
     |> Calculator.calculate_taxes(:inclusive)
     |> Calculator.calculate_taxes(:exclusive)
+    |> Calculator.remove_duplicates()
     |> Calculator.set_total_price()
     |> format_result()
   end
