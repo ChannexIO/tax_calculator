@@ -13,6 +13,7 @@ defmodule Taxes.Organizer do
     Map.merge(
       payload,
       taxes
+      |> build_tree_by_level()
       |> build_taxes_tree()
       |> group_taxes_by(:is_inclusive)
       |> group_taxes_by(:logic)
@@ -20,6 +21,31 @@ defmodule Taxes.Organizer do
   end
 
   def group_taxes(payload), do: payload
+
+  @doc """
+  Method to recursive build tax tree based at level option
+  """
+  def build_tree_by_level(taxes) do
+    taxes_by_level = Enum.group_by(taxes, &Map.get(&1, :level, 0))
+    taxes =
+      taxes
+      |> Enum.map(&Map.get(&1, :level, 0))
+      |> Enum.uniq()
+      |> Enum.sort()
+      |> Enum.reverse()
+      |> Enum.reduce(nil, fn level, acc ->
+        taxes_for_level = acc || Map.get(taxes_by_level, level, [])
+        higher_level_taxes = Map.get(taxes_by_level, level - 1, [])
+
+        case higher_level_taxes do
+          [] -> taxes_for_level
+          taxes ->
+            taxes |> Enum.map(fn tax -> Map.put(tax, :taxes, tax.taxes ++ taxes_for_level) end)
+          end
+      end)
+
+    taxes
+  end
 
   @doc """
   Method to recursive build tax tree
