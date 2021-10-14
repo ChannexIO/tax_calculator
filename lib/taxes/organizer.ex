@@ -44,7 +44,7 @@ defmodule Taxes.Organizer do
           end
       end)
 
-    taxes
+    taxes || []
   end
 
   @doc """
