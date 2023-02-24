@@ -16,6 +16,19 @@ defmodule TaxesTest do
     assert Taxes.calculate(100.00, taxes) == {:ok, 83.33, 100.00, [{"VAT", 16.67}]}
   end
 
+  test "should calculate inclusive tax for 149.00" do
+    taxes = [
+      %{
+        title: "VAT",
+        rate: 15.00,
+        is_inclusive: true,
+        logic: :percent
+      }
+    ]
+
+    assert Taxes.calculate(149.00, taxes) == {:ok, 129.56, 149.0, [{"VAT", 19.44}]}
+  end
+
   test "should calculate tax with rate provided as integer" do
     taxes = [
       %{
