@@ -27,6 +27,7 @@ defmodule Taxes.Organizer do
   """
   def build_tree_by_level(taxes) do
     taxes_by_level = Enum.group_by(taxes, &Map.get(&1, :level, 0))
+
     taxes =
       taxes
       |> Enum.map(&Map.get(&1, :level, 0))
@@ -38,13 +39,23 @@ defmodule Taxes.Organizer do
         higher_level_taxes = Map.get(taxes_by_level, level - 1, [])
 
         case higher_level_taxes do
-          [] -> taxes_for_level
+          [] ->
+            taxes_for_level
+
           taxes ->
-            taxes |> Enum.map(fn tax -> Map.put(tax, :taxes, tax.taxes ++ taxes_for_level) end)
-          end
+            collect_taxes(taxes, taxes_for_level)
+
+        end
       end)
 
     taxes || []
+  end
+
+  def collect_taxes(taxes, taxes_for_level) do
+    Enum.map(
+      taxes,
+      fn tax -> Map.put(tax, :taxes, tax.taxes ++ taxes_for_level) end
+    )
   end
 
   @doc """

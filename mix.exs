@@ -4,8 +4,8 @@ defmodule Taxes.MixProject do
   def project do
     [
       app: :taxes,
-      version: "0.2.11",
-      elixir: "~> 1.9",
+      version: "0.3.0",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
@@ -29,9 +29,9 @@ defmodule Taxes.MixProject do
   defp deps do
     [
       {:mix_test_watch, "~> 1.1", only: :dev, runtime: false},
-      {:credo, "~> 1.6.1", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.14", only: :test},
+      {:credo, "~> 1.7.4", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 
