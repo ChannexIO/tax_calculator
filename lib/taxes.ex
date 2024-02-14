@@ -2,8 +2,9 @@ defmodule Taxes do
   @moduledoc """
   Module to calculate Taxes
   """
-  alias Taxes.Organizer
   alias Taxes.Calculator
+  alias Taxes.DatesCalculator
+  alias Taxes.Organizer
   alias Taxes.Types
 
   @doc """
@@ -14,7 +15,14 @@ defmodule Taxes do
   To do that, at first step, we should group taxes by type.
   """
   @spec calculate(float() | integer(), [Types.tax()]) :: {:ok, float(), float(), [tuple()]}
-  def calculate(price, taxes, exponent \\ 2, count_of_persons \\ 1, count_of_rooms \\ 1, count_of_nights \\ 1) do
+  def calculate(
+        price,
+        taxes,
+        exponent \\ 2,
+        count_of_persons \\ 1,
+        count_of_rooms \\ 1,
+        count_of_nights \\ 1
+      ) do
     %{
       taxes: taxes,
       raw_price: price,
@@ -32,6 +40,19 @@ defmodule Taxes do
     |> Calculator.remove_duplicates()
     |> Calculator.set_total_price()
     |> format_result()
+  end
+
+  @spec calculate_with_dates(map(), [Types.tax()]) :: {:ok, float(), float(), [tuple()]}
+  def calculate_with_dates(
+        dates,
+        taxes,
+        exponent \\ 2,
+        count_of_persons \\ 1,
+        count_of_rooms \\ 1
+      ) do
+    dates
+    |> DatesCalculator.calculate(taxes, exponent, count_of_persons, count_of_rooms)
+    |> DatesCalculator.aggregate_taxes()
   end
 
   def format_result(%{net_price: price, total_price: total_price, calculated_taxes: taxes}) do
