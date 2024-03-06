@@ -44,7 +44,6 @@ defmodule Taxes.Organizer do
 
           taxes ->
             collect_taxes(taxes, taxes_for_level)
-
         end
       end)
 

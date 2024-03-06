@@ -16,7 +16,8 @@ defmodule Taxes.DateFilter do
     filter_by_max_nights(Map.get(tax, :max_nights), date_index) and
       filter_by_skip_nights(Map.get(tax, :skip_nights), date_index) and
       filter_by_applicable_after(Map.get(tax, :applicable_after), date) and
-      filter_by_applicable_before(Map.get(tax, :applicable_before), date)
+      filter_by_applicable_before(Map.get(tax, :applicable_before), date) and
+      filter_per_booking_taxes(Map.get(tax, :logic), date_index)
   end
 
   def filter_by_max_nights(nil, _), do: true
@@ -42,4 +43,12 @@ defmodule Taxes.DateFilter do
   def filter_by_applicable_before(applicable_before, date) do
     Date.compare(date, applicable_before) in [:eq, :lt]
   end
+
+  def filter_per_booking_taxes("per_booking", 0), do: true
+  def filter_per_booking_taxes(:per_booking, 0), do: true
+  def filter_per_booking_taxes("per_room", 0), do: true
+  def filter_per_booking_taxes(:per_room, 0), do: true
+  def filter_per_booking_taxes("per_person", 0), do: true
+  def filter_per_booking_taxes(:per_person, 0), do: true
+  def filter_per_booking_taxes(_, _), do: false
 end
