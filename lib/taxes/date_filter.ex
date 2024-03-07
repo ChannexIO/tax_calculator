@@ -50,5 +50,11 @@ defmodule Taxes.DateFilter do
   def filter_per_booking_taxes(:per_room, 0), do: true
   def filter_per_booking_taxes("per_person", 0), do: true
   def filter_per_booking_taxes(:per_person, 0), do: true
-  def filter_per_booking_taxes(_, _), do: false
+  def filter_per_booking_taxes("per_booking", _), do: false
+  def filter_per_booking_taxes(:per_booking, _), do: false
+  def filter_per_booking_taxes("per_room", _), do: false
+  def filter_per_booking_taxes(:per_room, _), do: false
+  def filter_per_booking_taxes("per_person", _), do: false
+  def filter_per_booking_taxes(:per_person, _), do: false
+  def filter_per_booking_taxes(_, _), do: true
 end
