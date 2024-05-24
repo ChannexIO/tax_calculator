@@ -395,5 +395,66 @@ defmodule TaxesTest do
       assert Taxes.calculate_with_dates(dates, taxes) ==
                {:ok, 166.66, 200.00, [{"VAT from 2 night", 16.67}, {"VAT for 1 night", 16.67}]}
     end
+
+    test "should calculate taxes and apply applicable_date_ranges filters" do
+      taxes = [
+        %{
+          title: "VAT for 1 night",
+          rate: 20.00,
+          is_inclusive: true,
+          logic: :percent,
+          applicable_date_ranges: [%{after: nil, before: ~D[2019-12-31]}]
+        },
+        %{
+          title: "VAT from 2 night",
+          rate: 20.00,
+          is_inclusive: true,
+          logic: :percent,
+          applicable_date_ranges: [%{after: ~D[2020-01-01], before: nil}]
+        },
+        %{
+          title: "VAT for far future",
+          rate: 20.00,
+          is_inclusive: true,
+          logic: :percent,
+          applicable_date_ranges: [%{after: ~D[2030-01-01], before: ~D[2030-12-31]}]
+        }
+      ]
+
+      dates = %{
+        ~D[2019-12-31] => 100,
+        ~D[2020-01-01] => 100
+      }
+
+      assert Taxes.calculate_with_dates(dates, taxes) ==
+               {:ok, 166.66, 200.00, [{"VAT from 2 night", 16.67}, {"VAT for 1 night", 16.67}]}
+    end
+
+    test "should calculate taxes and ingnote empty applicable_date_ranges filters" do
+      taxes = [
+        %{
+          title: "VAT for 1 night",
+          rate: 20.00,
+          is_inclusive: true,
+          logic: :percent,
+          applicable_date_ranges: nil
+        },
+        %{
+          title: "VAT from 2 night",
+          rate: 20.00,
+          is_inclusive: true,
+          logic: :percent,
+          applicable_date_ranges: []
+        }
+      ]
+
+      dates = %{
+        ~D[2019-12-31] => 100,
+        ~D[2020-01-01] => 100
+      }
+
+      assert Taxes.calculate_with_dates(dates, taxes) ==
+               {:ok, 142.84, 200.00, [{"VAT from 2 night", 28.58}, {"VAT for 1 night", 28.58}]}
+    end
   end
 end
