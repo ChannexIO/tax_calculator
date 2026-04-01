@@ -268,6 +268,34 @@ defmodule TaxesTest do
                 ]}
     end
 
+    test "should calculate Indian GST with CGST and SGST (level-based inclusive)" do
+      # GST is calculated on net price (level 1)
+      # CGST and SGST are calculated on (net + GST) (level 0)
+      #
+      # | | Amount |
+      # |---------------------------------|--------|
+      # | Net price | 71.82 |
+      # | GST 18% (level 1, on net) | 12.93 |
+      # | CGST 9% (level 0, on net + GST) | 7.63 |
+      # | SGST 9% (level 0, on net + GST) | 7.63 |
+      # | Sell price | 100.00 |
+
+      taxes = [
+        %{title: "GST", rate: 18.0, is_inclusive: true, logic: :percent, taxes: [], level: 1},
+        %{title: "CGST", rate: 9.0, is_inclusive: true, logic: :percent, taxes: [], level: 0},
+        %{title: "SGST", rate: 9.0, is_inclusive: true, logic: :percent, taxes: [], level: 0}
+      ]
+
+      assert {:ok, net_price, total_price, calculated_taxes} = Taxes.calculate(100.00, taxes)
+
+      assert net_price == 71.81
+      assert total_price == 100.0
+
+      assert {"GST", 12.93} in calculated_taxes
+      assert {"CGST", 7.63} in calculated_taxes
+      assert {"SGST", 7.63} in calculated_taxes
+    end
+
     test "should calculate USA 2 level tax case" do
       taxes = [
         %{

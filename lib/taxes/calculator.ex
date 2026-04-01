@@ -56,30 +56,52 @@ defmodule Taxes.Calculator do
   @spec get_tax_amounts(map(), map(), Types.payload()) :: map()
   def get_tax_amounts(taxes, acc, payload) do
     taxes
-    |> Enum.reduce(acc, fn {_mode, taxes}, acc ->
-      taxes
-      |> Enum.reduce(acc, fn tax, acc ->
-        %{percent: percent, fixed: fixed} =
-          get_tax_amounts(Map.get(tax, :taxes, %{}), %{percent: 0, fixed: 0}, payload)
+    |> Enum.reduce(acc, fn {_mode, group_taxes}, acc ->
+      unique_children_map = collect_unique_child_taxes(group_taxes)
+      children_flat = get_tax_amounts(unique_children_map, %{percent: 0, fixed: 0}, payload)
 
-        get_tax_amount(tax.logic, acc, tax, fixed, percent, payload)
-      end)
+      parent_contrib =
+        Enum.reduce(group_taxes, %{percent: 0, fixed: 0}, fn tax, pacc ->
+          children_for_tax =
+            get_tax_amounts(Map.get(tax, :taxes, %{}), %{percent: 0, fixed: 0}, payload)
+
+          get_parent_contribution(tax.logic, pacc, tax, children_for_tax, payload)
+        end)
+
+      %{
+        percent: acc.percent + children_flat.percent + parent_contrib.percent,
+        fixed: acc.fixed + children_flat.fixed + parent_contrib.fixed
+      }
     end)
   end
 
-  def get_tax_amount(logic, acc, tax, fixed, percent, _) when logic in [:percent, "percent"] do
+  defp collect_unique_child_taxes(group_taxes) do
+    group_taxes
+    |> Enum.flat_map(fn tax ->
+      Map.get(tax, :taxes, %{})
+      |> Enum.flat_map(fn {_logic, taxes} -> taxes end)
+    end)
+    |> Enum.uniq_by(& &1.title)
+    |> case do
+      [] -> %{}
+      taxes -> Enum.group_by(taxes, &Map.fetch!(&1, :logic))
+    end
+  end
+
+  defp get_parent_contribution(logic, acc, tax, %{percent: percent, fixed: fixed}, _payload)
+       when logic in [:percent, "percent"] do
     %{
-      percent: acc.percent + tax.rate + percent + percent / 100 * (tax.rate / 100) * 100,
-      fixed: acc.fixed + fixed + fixed * (tax.rate / 100)
+      percent: acc.percent + tax.rate + percent / 100 * (tax.rate / 100) * 100,
+      fixed: acc.fixed + fixed * (tax.rate / 100)
     }
   end
 
-  def get_tax_amount(_, acc, tax, fixed, percent, payload) do
+  defp get_parent_contribution(_, acc, tax, _children, payload) do
     {_, tax_amount} = Logic.calculate_tax(tax, payload)
 
     %{
-      percent: acc.percent + percent,
-      fixed: acc.fixed + fixed + tax_amount
+      percent: acc.percent,
+      fixed: acc.fixed + tax_amount
     }
   end
 
